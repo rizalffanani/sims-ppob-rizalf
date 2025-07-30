@@ -1,24 +1,7 @@
-import axios from 'axios';
-
-const API_URL = 'https://take-home-test-api.nutech-integrasi.com';
-
-const api = axios.create({
-  baseURL: API_URL,
-});
-
-api.interceptors.request.use(config => {
-  const savedUser = localStorage.getItem('user');
-  if (savedUser) {
-    const token = JSON.parse(savedUser).token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
-});
+import api from "../api";
 
 export const loginAPI = async (email: string, password: string) => {
-  const res = await api.post('/login', { email, password });
+  const res = await api.post("/login", { email, password });
   return res.data;
 };
 
@@ -28,11 +11,16 @@ export const registerAPI = async (
   last_name: string,
   password: string
 ) => {
-  const res = await api.post('/registration', { email, first_name, last_name, password });
+  const res = await api.post("/registration", {
+    email,
+    first_name,
+    last_name,
+    password,
+  });
   return res.data;
 };
 
 export const getProfileAPI = async () => {
-  const res = await api.get('/profile');
+  const res = await api.get("/profile");
   return res.data;
 };
