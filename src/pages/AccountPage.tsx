@@ -1,32 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
-  fetchProfile,
+  getProfile,
   saveProfile,
-  uploadImage,
-  logoutProfile,
-} from "../features/account/accountSlice";
-import { logout } from "../features/auth/authSlice";
+  uploadProfileImage,
+  logout,
+} from "../features/auth/authSlice";
 import defaultImg from "../assets/profil.png";
 import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { data: profile } = useAppSelector((state) => state.account);
+  const profile = useAppSelector((state) => state.auth.user);
   const [edit, setEdit] = useState(false);
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
   useEffect(() => {
-    dispatch(fetchProfile());
+    dispatch(getProfile());
   }, [dispatch]);
 
   useEffect(() => {
-    setEmail(profile.email);
-    setFirstName(profile.first_name);
-    setLastName(profile.last_name);
+    setEmail(profile?.email || "");
+    setFirstName(profile?.first_name || "");
+    setLastName(profile?.last_name || "");
   }, [profile]);
 
   const handleSave = () => {
@@ -41,7 +40,7 @@ const ProfilePage = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.size <= 100 * 1024) {
-      dispatch(uploadImage(file));
+      dispatch(uploadProfileImage(file));
     } else {
       alert("Ukuran gambar maksimal 100KB");
     }
@@ -49,7 +48,6 @@ const ProfilePage = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    dispatch(logoutProfile());
     navigate("/login");
   };
 
@@ -59,7 +57,7 @@ const ProfilePage = () => {
 
       <div className="flex items-center gap-4 mb-4">
         <img
-          src={profile.profile_image || defaultImg}
+          src={profile?.profile_image || defaultImg}
           alt="Profile"
           className="w-20 h-20 rounded-full object-cover cursor-pointer"
           onClick={() => document.getElementById("upload")?.click()}
