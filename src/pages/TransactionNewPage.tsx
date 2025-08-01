@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
-  getServices,
+  fetchServices,
   clearSelectedService,
 } from "../features/services/serviceSlice";
 import { newTransaction } from "../features/transaction/transactionSlice";
@@ -16,7 +16,7 @@ const TransactionNewPage = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    dispatch(getServices());
+    dispatch(fetchServices());
   }, [dispatch]);
 
   useEffect(() => {
@@ -27,11 +27,16 @@ const TransactionNewPage = () => {
     if (!selectedService) return;
 
     setLoading(true);
-    await dispatch(
-      newTransaction({ service_code: selectedService.service_code })
-    );
-    alert("Transaksi berhasil!");
-    setLoading(false);
+    try {
+      await dispatch(
+        newTransaction({ service_code: selectedService.service_code })
+      );
+      alert("Transaksi berhasil!");
+    } catch {
+      alert("Gagal melakukan transaksi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!selectedService) return null;
@@ -47,6 +52,10 @@ const TransactionNewPage = () => {
             src={selectedService.service_icon}
             alt={selectedService.service_name}
             className="h-10"
+            onError={(e) =>
+              (e.currentTarget.src =
+                "https://via.placeholder.com/40?text=No+Icon")
+            }
           />
           <p className="text-sm">{selectedService.service_name}</p>
         </div>
@@ -61,7 +70,7 @@ const TransactionNewPage = () => {
         <button
           onClick={handleTransaction}
           disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded w-full"
+          className="bg-blue-500 text-white px-4 py-2 rounded w-full disabled:opacity-50"
         >
           {loading ? "Memproses..." : "Kirim Transaksi"}
         </button>

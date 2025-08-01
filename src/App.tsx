@@ -1,5 +1,4 @@
 import React, { type ReactElement } from "react";
-import "./App.css";
 import {
   BrowserRouter as Router,
   Routes,

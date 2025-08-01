@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getBannerAPI } from "./bannerAPI";
 import type { RootState } from "../../app/store";
 
-interface Banner {
+export interface Banner {
   banner_name: string;
   banner_image: string;
   description: string;
@@ -20,11 +20,13 @@ const initialState: BannerState = {
   error: null,
 };
 
-export const getBanner = createAsyncThunk(
-  "banner/fetch",
+// ✅ Ubah nama agar konsisten
+export const fetchBanner = createAsyncThunk(
+  "banner/fetchBanner",
   async (_, thunkAPI) => {
     try {
-      return await getBannerAPI();
+      const response = await getBannerAPI();
+      return response.data;
     } catch {
       return thunkAPI.rejectWithValue("Gagal mengambil data banner");
     }
@@ -36,20 +38,24 @@ const bannerSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getBanner.pending, (state) => {
+    builder.addCase(fetchBanner.pending, (state) => {
       state.loading = true;
       state.error = null;
     });
-    builder.addCase(getBanner.fulfilled, (state, action) => {
+    builder.addCase(fetchBanner.fulfilled, (state, action) => {
       state.loading = false;
-      state.data = action.payload.data;
+      state.data = action.payload;
     });
-    builder.addCase(getBanner.rejected, (state, action) => {
+    builder.addCase(fetchBanner.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
     });
   },
 });
 
+// ✅ Selector biar komplit
 export const selectBanner = (state: RootState) => state.banner.data;
+export const selectBannerLoading = (state: RootState) => state.banner.loading;
+export const selectBannerError = (state: RootState) => state.banner.error;
+
 export default bannerSlice.reducer;

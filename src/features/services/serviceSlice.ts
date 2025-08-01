@@ -23,11 +23,13 @@ const initialState: ServiceState = {
   error: null,
 };
 
-export const getServices = createAsyncThunk(
-  "services/fetch",
+// Fetch all services
+export const fetchServices = createAsyncThunk(
+  "services/fetchServices",
   async (_, thunkAPI) => {
     try {
-      return await getServicesAPI();
+      const response = await getServicesAPI();
+      return response.data;
     } catch {
       return thunkAPI.rejectWithValue("Gagal mengambil data layanan");
     }
@@ -38,29 +40,35 @@ const serviceSlice = createSlice({
   name: "services",
   initialState,
   reducers: {
-    selectService: (state, action: PayloadAction<Service>) => {
+    selectService(state, action: PayloadAction<Service>) {
       state.selectedService = action.payload;
     },
-    clearSelectedService: (state) => {
+    clearSelectedService(state) {
       state.selectedService = null;
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(getServices.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(getServices.fulfilled, (state, action) => {
-      state.loading = false;
-      state.data = action.payload.data;
-    });
-    builder.addCase(getServices.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
-  },
+  extraReducers: (builder) =>
+    builder
+      .addCase(fetchServices.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchServices.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(fetchServices.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      }),
 });
 
+// Export actions
 export const { selectService, clearSelectedService } = serviceSlice.actions;
-export const serviceSelector = (state: RootState) => state.services.data;
+
+// Export selectors
+export const selectServices = (state: RootState) => state.services.data;
+export const selectSelectedService = (state: RootState) =>
+  state.services.selectedService;
+
 export default serviceSlice.reducer;

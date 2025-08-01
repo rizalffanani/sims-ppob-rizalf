@@ -4,8 +4,7 @@ import type { RootState } from "../../app/store";
 
 interface HistoryItem {
   invoice_number: string;
-  service_code: string;
-  service_name: string;
+  description: string;
   transaction_type: string;
   total_amount: number;
   created_on: string;
@@ -17,6 +16,7 @@ interface TransactionState {
   error: string | null;
   offset: number;
   limit: number;
+  hasMore: boolean;
 }
 
 const initialState: TransactionState = {
@@ -25,6 +25,7 @@ const initialState: TransactionState = {
   error: null,
   offset: 0,
   limit: 5,
+  hasMore: true,
 };
 
 // Async: Fetch history
@@ -63,6 +64,7 @@ const transactionSlice = createSlice({
     resetHistory(state) {
       state.items = [];
       state.offset = 0;
+      state.hasMore = true;
     },
     incrementOffset(state) {
       state.offset += state.limit;
@@ -76,7 +78,17 @@ const transactionSlice = createSlice({
       })
       .addCase(fetchHistory.fulfilled, (state, action) => {
         state.loading = false;
-        state.items.push(...action.payload);
+
+        // Filter duplikat berdasarkan invoice_number
+        const newItems = (action.payload as HistoryItem[]).filter(
+          (item: HistoryItem) =>
+            !state.items.some(
+              (existing) => existing.invoice_number === item.invoice_number
+            )
+        );
+
+        state.items.push(...newItems);
+        state.hasMore = newItems.length > 0; // Jika tidak ada data baru, berarti data habis
       })
       .addCase(fetchHistory.rejected, (state, action) => {
         state.loading = false;

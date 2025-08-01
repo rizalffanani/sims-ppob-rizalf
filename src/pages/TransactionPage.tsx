@@ -5,9 +5,9 @@ import {
   incrementOffset,
 } from "../features/transaction/transactionSlice";
 
-const TransactionHistory: React.FC = () => {
+const TransactionPage = () => {
   const dispatch = useAppDispatch();
-  const { loading, error, items } = useAppSelector(
+  const { loading, error, items, hasMore } = useAppSelector(
     (state) => state.transaction
   );
 
@@ -16,15 +16,17 @@ const TransactionHistory: React.FC = () => {
   }, [dispatch]);
 
   const handleShowMore = () => {
-    dispatch(incrementOffset());
-    dispatch(fetchHistory());
+    if (!loading && hasMore) {
+      dispatch(incrementOffset());
+      dispatch(fetchHistory());
+    }
   };
 
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">Transaction History</h1>
 
-      {loading && <p>Loading...</p>}
+      {loading && items.length === 0 && <p>Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
       <ul className="space-y-3">
@@ -33,7 +35,7 @@ const TransactionHistory: React.FC = () => {
             key={item.invoice_number}
             className="border rounded-xl p-4 shadow-sm"
           >
-            <p className="font-semibold">{item.service_name}</p>
+            <p className="font-semibold">{item.description}</p>
             <p className="text-sm text-gray-600">{item.transaction_type}</p>
             <p className="text-green-600">
               Rp {item.total_amount.toLocaleString("id-ID")}
@@ -45,13 +47,24 @@ const TransactionHistory: React.FC = () => {
         ))}
       </ul>
 
-      {items.length > 0 && (
+      {hasMore && !loading && (
         <div className="text-center mt-4">
-          <button onClick={handleShowMore}>Show More</button>
+          <button
+            onClick={handleShowMore}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Show More
+          </button>
         </div>
+      )}
+
+      {!hasMore && items.length > 0 && (
+        <p className="text-center mt-4 text-gray-500">
+          Semua transaksi telah ditampilkan.
+        </p>
       )}
     </div>
   );
 };
 
-export default TransactionHistory;
+export default TransactionPage;
