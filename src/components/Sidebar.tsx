@@ -1,48 +1,66 @@
+import {
+  Box,
+  Flex,
+  Image,
+  Text,
+  Link as ChakraLink,
+  Spacer,
+} from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
+import logoImg from "../assets/logo.png";
 
 const Sidebar = () => {
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
 
+  const navItems = [
+    { label: "Top Up", path: "/topup" },
+    { label: "Transaction", path: "/transaction" },
+    { label: "Akun", path: "/account" },
+  ];
+
   return (
-    <aside className="w-64 h-screen bg-gray-800 text-white p-4">
-      <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
-      <nav className="flex flex-col gap-3">
-        <Link
-          to="/dashboard"
-          className={`p-2 rounded ${
-            isActive("/dashboard") ? "bg-gray-700" : "hover:bg-gray-700"
-          }`}
-        >
-          Dashboard
-        </Link>
-        <Link
-          to="/topup"
-          className={`p-2 rounded ${
-            isActive("/topup") ? "bg-gray-700" : "hover:bg-gray-700"
-          }`}
-        >
-          Top Up
-        </Link>
-        <Link
-          to="/transaction"
-          className={`p-2 rounded ${
-            isActive("/transaction") ? "bg-gray-700" : "hover:bg-gray-700"
-          }`}
-        >
-          Transaction
-        </Link>
-        <Link
-          to="/account"
-          className={`p-2 rounded ${
-            isActive("/account") ? "bg-gray-700" : "hover:bg-gray-700"
-          }`}
-        >
-          Akun
-        </Link>
-      </nav>
-    </aside>
+    <Box maxW="6xl" mx="auto">
+      <Flex
+        as="header"
+        align="center"
+        px={6}
+        py={4}
+        boxShadow="sm"
+        bg="white"
+        position="sticky"
+        top={0}
+        zIndex={10}
+      >
+        <Flex align="center" gap={2}>
+          <Link to={"/dashboard"}>
+            <Image src={logoImg} alt="SIMS PPOB" boxSize="30px" />
+            <Text fontWeight="bold">SIMS PPOB</Text>
+          </Link>
+        </Flex>
+
+        <Spacer />
+
+        <Flex gap={4}>
+          {navItems.map((item) => (
+            <ChakraLink
+              key={item.path}
+              as={Link}
+              to={item.path}
+              px={3}
+              py={2}
+              borderRadius="md"
+              fontWeight="medium"
+              color={isActive(item.path) ? "red" : "gray.600"}
+              _hover={{ color: "red" }}
+            >
+              {item.label}
+            </ChakraLink>
+          ))}
+        </Flex>
+      </Flex>
+    </Box>
   );
 };
 

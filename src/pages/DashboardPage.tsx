@@ -1,4 +1,14 @@
 import { useEffect } from "react";
+import {
+  Box,
+  Text,
+  Heading,
+  SimpleGrid,
+  Image,
+  VStack,
+  HStack,
+  Skeleton,
+} from "@chakra-ui/react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   fetchServices,
@@ -27,54 +37,56 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="max-w-md mx-auto my-12 px-4">
-      <h2 className="text-xl font-bold mb-4">Pilih Layanan</h2>
-
+    <Box maxW="6xl" mx="auto" mt={12} px={6}>
       {services.length === 0 ? (
-        <p className="text-gray-500">Tidak ada layanan</p>
+        <Text color="gray.500">Tidak ada layanan</Text>
       ) : (
-        <div className="space-y-3">
-          {services.map((s) => (
-            <div
+        <SimpleGrid columns={[4, 6, 10]} spacing={4} mb={10}>
+          {services.map((s: any) => (
+            <VStack
               key={s.service_code}
+              cursor="pointer"
               onClick={() => handleSelectService(s)}
-              className="flex items-center gap-3 p-3 border rounded cursor-pointer hover:bg-gray-50"
+              p={3}
+              borderRadius="md"
+              _hover={{ bg: "gray.50" }}
+              transition="0.2s"
             >
-              <img
+              <Image
                 src={s.service_icon}
                 alt={s.service_name}
-                className="w-8 h-8"
-                onError={(e) =>
-                  (e.currentTarget.src = "https://via.placeholder.com/30")
-                }
+                boxSize="50px"
+                fallback={<Skeleton boxSize="50px" />}
               />
-              <span className="text-sm font-medium">
-                {s.service_name} - Rp {s.service_tariff.toLocaleString("id-ID")}
-              </span>
-            </div>
+              <Text fontSize="sm" textAlign="center">
+                {s.service_name}
+              </Text>
+            </VStack>
           ))}
-        </div>
+        </SimpleGrid>
       )}
 
-      <h3 className="text-lg font-semibold mt-8 mb-2">Temukan promo menarik</h3>
+      <Heading size="md" mb={4}>
+        Temukan promo menarik
+      </Heading>
 
       {banners.length === 0 ? (
-        <p className="text-gray-500">Tidak ada banner</p>
+        <Text color="gray.500">Tidak ada banner</Text>
       ) : (
-        <div style={{ display: "flex", gap: "10px", overflowX: "auto" }}>
-          {banners.map((b, i) => (
-            <img
-              key={i}
-              src={b.banner_image}
-              alt={b.banner_name}
-              className="w-40 rounded"
-              onError={(e) =>
-                (e.currentTarget.src = "https://via.placeholder.com/150x80")
-              }
-            />
+        <HStack spacing={4} overflowX="auto" py={2}>
+          {banners.map((b: any, i: number) => (
+            <Box minW="220px" key={i}>
+              <Image
+                src={b.banner_image}
+                alt={b.banner_name}
+                borderRadius="md"
+                boxShadow="md"
+                fallbackSrc="https://via.placeholder.com/220x120"
+              />
+            </Box>
           ))}
-        </div>
+        </HStack>
       )}
-    </div>
+    </Box>
   );
 }
