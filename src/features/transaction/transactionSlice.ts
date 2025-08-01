@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getHistoryTransactionAPI } from "./transactionAPI";
+import { getHistoryTransactionAPI, newTransactionAPI } from "./transactionAPI";
 import type { RootState } from "../../app/store";
+
 interface HistoryItem {
   invoice_number: string;
   service_code: string;
@@ -10,7 +11,7 @@ interface HistoryItem {
   created_on: string;
 }
 
-interface HistoryState {
+interface TransactionState {
   items: HistoryItem[];
   loading: boolean;
   error: string | null;
@@ -18,7 +19,7 @@ interface HistoryState {
   limit: number;
 }
 
-const initialState: HistoryState = {
+const initialState: TransactionState = {
   items: [],
   loading: false,
   error: null,
@@ -26,24 +27,37 @@ const initialState: HistoryState = {
   limit: 5,
 };
 
+// Async: Fetch history
 export const fetchHistory = createAsyncThunk(
-  "history/fetchHistory",
+  "transaction/fetchHistory",
   async (_, thunkAPI) => {
     try {
-      const state = thunkAPI.getState() as RootState;
-      const { offset, limit } = state.transaction;
-      return await getHistoryTransactionAPI(
+      const { offset, limit } = (thunkAPI.getState() as RootState).transaction;
+      const response = await getHistoryTransactionAPI(
         offset.toString(),
         limit.toString()
       );
+      return response.data?.records || [];
     } catch {
-      return thunkAPI.rejectWithValue("Gagal mengambil data layanan");
+      return thunkAPI.rejectWithValue("Gagal mengambil riwayat transaksi");
     }
   }
 );
 
-const historySlice = createSlice({
-  name: "history",
+// Async: New transaction
+export const newTransaction = createAsyncThunk(
+  "transaction/newTransaction",
+  async (payload: { service_code: string }, thunkAPI) => {
+    try {
+      return await newTransactionAPI(payload);
+    } catch {
+      return thunkAPI.rejectWithValue("Gagal memproses transaksi");
+    }
+  }
+);
+
+const transactionSlice = createSlice({
+  name: "transaction",
   initialState,
   reducers: {
     resetHistory(state) {
@@ -62,7 +76,7 @@ const historySlice = createSlice({
       })
       .addCase(fetchHistory.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = [...state.items, ...action.payload.data.records];
+        state.items.push(...action.payload);
       })
       .addCase(fetchHistory.rejected, (state, action) => {
         state.loading = false;
@@ -71,5 +85,5 @@ const historySlice = createSlice({
   },
 });
 
-export const { resetHistory, incrementOffset } = historySlice.actions;
-export default historySlice.reducer;
+export const { resetHistory, incrementOffset } = transactionSlice.actions;
+export default transactionSlice.reducer;

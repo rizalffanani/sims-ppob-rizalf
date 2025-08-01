@@ -9,3 +9,8 @@ export const getHistoryTransactionAPI = async (
   });
   return res.data;
 };
+
+export const newTransactionAPI = async (payload: { service_code: string }) => {
+  const res = await api.post("/transaction", payload);
+  return res.data;
+};
