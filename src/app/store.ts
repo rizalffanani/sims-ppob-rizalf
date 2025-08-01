@@ -3,6 +3,7 @@ import authReducer from "../features/auth/authSlice";
 import balanceReducer from "../features/balance/balanceSlice";
 import servicesReducer from "../features/services/serviceSlice";
 import bannerReducer from "../features/banner/bannerSlice";
+import transactionReducer from "../features/transaction/transactionSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     balance: balanceReducer,
     services: servicesReducer,
     banner: bannerReducer,
+    transaction: transactionReducer,
   },
 });
 

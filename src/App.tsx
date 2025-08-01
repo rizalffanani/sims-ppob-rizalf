@@ -13,7 +13,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import TopUpPage from "./pages/TopUpPage";
-import TransactionPage from "./pages/TransactionPage";
+import TransactionPage from "./pages/TransactionNewPage";
+import TransactionHistory from "./pages/TransactionPage";
 import { useAppSelector } from "./app/hooks";
 
 type LayoutProps = { children: React.ReactNode };
@@ -48,7 +49,8 @@ function App() {
             element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
           />
           <Route path="/topup" element={<TopUpPage />} />
-          <Route path="/transaction" element={<TransactionPage />} />
+          <Route path="/transactionNew" element={<TransactionPage />} />
+          <Route path="/transaction" element={<TransactionHistory />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </Layout>

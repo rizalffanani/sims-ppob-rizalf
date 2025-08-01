@@ -34,6 +34,14 @@ const Sidebar = () => {
         >
           Transaction
         </Link>
+        <Link
+          to="/transaction"
+          className={`p-2 rounded ${
+            isActive("/transaction") ? "bg-gray-700" : "hover:bg-gray-700"
+          }`}
+        >
+          Akun
+        </Link>
       </nav>
     </aside>
   );
