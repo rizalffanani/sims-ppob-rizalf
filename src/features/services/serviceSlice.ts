@@ -1,8 +1,8 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { getServicesAPI } from "./serviceAPI";
 import type { RootState } from "../../app/store";
 
-interface Service {
+export interface Service {
   service_code: string;
   service_name: string;
   service_icon: string;
@@ -11,12 +11,14 @@ interface Service {
 
 interface ServiceState {
   data: Service[];
+  selectedService: Service | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ServiceState = {
   data: [],
+  selectedService: null,
   loading: false,
   error: null,
 };
@@ -35,7 +37,14 @@ export const getServices = createAsyncThunk(
 const serviceSlice = createSlice({
   name: "services",
   initialState,
-  reducers: {},
+  reducers: {
+    selectService: (state, action: PayloadAction<Service>) => {
+      state.selectedService = action.payload;
+    },
+    clearSelectedService: (state) => {
+      state.selectedService = null;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(getServices.pending, (state) => {
       state.loading = true;
@@ -52,5 +61,6 @@ const serviceSlice = createSlice({
   },
 });
 
+export const { selectService, clearSelectedService } = serviceSlice.actions;
 export const selectServices = (state: RootState) => state.services.data;
 export default serviceSlice.reducer;
