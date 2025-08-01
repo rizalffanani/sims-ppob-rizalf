@@ -1,4 +1,3 @@
-// src/components/Sidebar.tsx
 import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
@@ -35,9 +34,9 @@ const Sidebar = () => {
           Transaction
         </Link>
         <Link
-          to="/transaction"
+          to="/account"
           className={`p-2 rounded ${
-            isActive("/transaction") ? "bg-gray-700" : "hover:bg-gray-700"
+            isActive("/account") ? "bg-gray-700" : "hover:bg-gray-700"
           }`}
         >
           Akun

@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { logout } from "../features/auth/authSlice";
 import {
   getServices,
   selectService,
@@ -24,11 +23,6 @@ export default function Dashboard() {
   const handleSelectService = (service: Service) => {
     dispatch(selectService(service));
     navigate("/transactionNew");
-  };
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
   };
 
   return (
@@ -70,7 +64,6 @@ export default function Dashboard() {
           ))}
         </div>
       )}
-      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 }

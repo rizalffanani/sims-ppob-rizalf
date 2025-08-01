@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   getServices,
-  selectService,
   clearSelectedService,
-  serviceSelector,
-  Service,
 } from "../features/services/serviceSlice";
 import api from "../features/api";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 const TransactionPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const services = useAppSelector(serviceSelector);
   const selectedService = useAppSelector(
     (state) => state.services.selectedService
   );
@@ -26,10 +22,6 @@ const TransactionPage = () => {
       navigate("/dashboard"); // kalau belum pilih service, balik ke dashboard
     }
   }, [dispatch, selectedService]);
-
-  const handleSelect = (data: Service) => {
-    dispatch(selectService(data));
-  };
 
   const handleTransaction = async () => {
     if (!selectedService) return;

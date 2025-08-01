@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type ReactElement } from "react";
 import "./App.css";
 import {
   BrowserRouter as Router,
@@ -8,23 +8,26 @@ import {
   useLocation,
 } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
-import Header from "./components/Header"; // ⬅️ Import Header
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
+import Header from "./components/Header";
+import Login from "./pages/LoginPage";
+import Register from "./pages/RegisterPage";
+import Dashboard from "./pages/DashboardPage";
 import TopUpPage from "./pages/TopUpPage";
-import TransactionPage from "./pages/TransactionNewPage";
-import TransactionHistory from "./pages/TransactionPage";
+import Transaction from "./pages/TransactionPage";
+import TransactionNew from "./pages/TransactionNewPage";
+import AccountPage from "./pages/AccountPage";
 import { useAppSelector } from "./app/hooks";
 
-type LayoutProps = { children: React.ReactNode };
-const Layout = ({ children }: LayoutProps) => {
-  const location = useLocation();
-  const path = location.pathname;
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { pathname } = useLocation();
 
-  const showSidebar = path !== "/login" && path !== "/register";
-  const showHeader =
-    path === "/dashboard" || path === "/topup" || path === "/transaction";
+  const showSidebar = !["/login", "/register"].includes(pathname);
+  const showHeader = [
+    "/dashboard",
+    "/topup",
+    "/transaction",
+    "/transactionNew",
+  ].includes(pathname);
 
   return (
     <>
@@ -35,9 +38,12 @@ const Layout = ({ children }: LayoutProps) => {
   );
 };
 
-function App() {
+const PrivateRoute = ({ element }: { element: ReactElement }) => {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
+  return isAuthenticated ? element : <Navigate to="/login" />;
+};
 
+function App() {
   return (
     <Router>
       <Layout>
@@ -46,11 +52,24 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+            element={<PrivateRoute element={<Dashboard />} />}
           />
-          <Route path="/topup" element={<TopUpPage />} />
-          <Route path="/transactionNew" element={<TransactionPage />} />
-          <Route path="/transaction" element={<TransactionHistory />} />
+          <Route
+            path="/topup"
+            element={<PrivateRoute element={<TopUpPage />} />}
+          />
+          <Route
+            path="/transaction"
+            element={<PrivateRoute element={<Transaction />} />}
+          />
+          <Route
+            path="/transactionNew"
+            element={<PrivateRoute element={<TransactionNew />} />}
+          />
+          <Route
+            path="/account"
+            element={<PrivateRoute element={<AccountPage />} />}
+          />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </Layout>

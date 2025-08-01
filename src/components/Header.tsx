@@ -18,7 +18,7 @@ export default function Header() {
 
   return (
     <div>
-      <img src={profileImg} alt="Profile" />
+      <img src={user?.profile_image || profileImg} alt="Profile" />
       <p>Selamat datang,</p>
       <h1>
         <b>

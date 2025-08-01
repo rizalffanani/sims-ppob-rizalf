@@ -7,7 +7,7 @@ import {
 
 const TransactionHistory: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { loading, error, items, limit } = useAppSelector(
+  const { loading, error, items } = useAppSelector(
     (state) => state.transaction
   );
 
