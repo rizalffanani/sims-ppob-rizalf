@@ -5,12 +5,7 @@ export const getBalanceAPI = async () => {
   return res.data;
 };
 
-export const topUp = async (amount: number) => {
-  const res = await api.post("/topup", { top_up_amount: amount });
-  return res.data;
-};
-
-export const getTransactionHistory = async () => {
-  const res = await api.get("/transaction/history");
+export const topUpBalance = async (payload: { top_up_amount: number }) => {
+  const res = await api.post("/topup", payload);
   return res.data;
 };

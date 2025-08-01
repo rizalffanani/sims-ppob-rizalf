@@ -1,21 +1,22 @@
-// src/pages/TopUpPage.tsx
 import { useState } from "react";
-import { topUp } from "../features/balance/balanceAPI";
+import { useAppDispatch } from "../app/hooks";
+import { saveTopup } from "../features/balance/balanceSlice";
 
 const TopUpPage = () => {
-  const [amount, setAmount] = useState("");
+  const dispatch = useAppDispatch();
+  const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   const handleTopUp = async () => {
+    if (amount <= 0) return;
+
     setLoading(true);
-    setMessage("");
     try {
-      const response = await topUp(parseInt(amount));
-      setMessage("Top up berhasil!");
-      console.log(response);
-    } catch (error) {
-      setMessage("Top up gagal!");
+      await dispatch(saveTopup({ top_up_amount: amount }));
+      alert("Top up berhasil!");
+      setAmount(0); // reset nominal setelah sukses
+    } catch {
+      alert("Terjadi kesalahan saat top up.");
     } finally {
       setLoading(false);
     }
@@ -24,22 +25,22 @@ const TopUpPage = () => {
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">Top Up</h2>
-      <div className="bg-white p-4 rounded shadow">
-        <label className="block mb-2">Nominal Top Up</label>
+      <div className="bg-white p-4 rounded shadow max-w-sm mx-auto">
+        <label className="block mb-2 font-medium">Nominal Top Up</label>
         <input
           type="number"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => setAmount(Number(e.target.value))}
           className="border p-2 rounded w-full mb-4"
+          min={1}
         />
         <button
           onClick={handleTopUp}
-          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-          disabled={loading || !amount}
+          disabled={loading || amount <= 0}
+          className="bg-blue-600 text-white px-4 py-2 rounded w-full disabled:opacity-50"
         >
           {loading ? "Memproses..." : "Top Up"}
         </button>
-        {message && <p className="mt-4">{message}</p>}
       </div>
     </div>
   );
