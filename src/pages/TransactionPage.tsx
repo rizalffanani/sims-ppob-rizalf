@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Box, Button, Flex, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   fetchHistory,
@@ -11,59 +12,96 @@ const TransactionPage = () => {
     (state) => state.transaction
   );
 
+  const formatDate = (dateStr: string) =>
+    new Date(dateStr).toLocaleString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
   useEffect(() => {
     dispatch(fetchHistory());
   }, [dispatch]);
 
   const handleShowMore = () => {
     if (!loading && hasMore) {
-      dispatch(incrementOffset());
       dispatch(fetchHistory());
     }
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Transaction History</h1>
+    <Box maxW="6xl" mx="auto" mt={12} px={6}>
+      <Text fontSize="xl" fontWeight="bold" mb={4}>
+        Semua Transaksi
+      </Text>
 
-      {loading && items.length === 0 && <p>Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-
-      <ul className="space-y-3">
-        {items.map((item) => (
-          <li
-            key={item.invoice_number}
-            className="border rounded-xl p-4 shadow-sm"
-          >
-            <p className="font-semibold">{item.description}</p>
-            <p className="text-sm text-gray-600">{item.transaction_type}</p>
-            <p className="text-green-600">
-              Rp {item.total_amount.toLocaleString("id-ID")}
-            </p>
-            <p className="text-xs text-gray-400">
-              {new Date(item.created_on).toLocaleString()}
-            </p>
-          </li>
-        ))}
-      </ul>
-
-      {hasMore && !loading && (
-        <div className="text-center mt-4">
-          <button
-            onClick={handleShowMore}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Show More
-          </button>
-        </div>
+      {loading && items.length === 0 && <Spinner />}
+      {error && (
+        <Text color="red.500" mb={4}>
+          {error}
+        </Text>
       )}
 
-      {!hasMore && items.length > 0 && (
-        <p className="text-center mt-4 text-gray-500">
+      <VStack spacing={3} align="stretch">
+        {items.map((item) => {
+          const isDebit = item.transaction_type.toLowerCase().includes("topup");
+          const amountColor = isDebit ? "green.500" : "red.500";
+          const amountPrefix = isDebit ? "+" : "-";
+
+          return (
+            <Flex
+              key={item.invoice_number}
+              p={4}
+              borderWidth="1px"
+              rounded="xl"
+              shadow="sm"
+              justify="space-between"
+              align="center"
+            >
+              <Box>
+                <Text fontWeight="bold" color={amountColor}>
+                  {amountPrefix} Rp{item.total_amount.toLocaleString("id-ID")}
+                </Text>
+                <Text fontSize="xs" color="gray.500">
+                  {formatDate(item.created_on)}
+                </Text>
+              </Box>
+              <Text fontSize="sm" color="gray.600" noOfLines={1}>
+                {item.description}
+              </Text>
+            </Flex>
+          );
+        })}
+      </VStack>
+
+      <Flex justify="center" mt={4}>
+        <Button variant="link" color="red.500" onClick={handleShowMore}>
+          Show more
+        </Button>
+      </Flex>
+
+      {/* {hasMore && !loading && (
+        <Flex justify="center" mt={4}>
+          <Button variant="link" color="red.500" onClick={handleShowMore}>
+            Show more
+          </Button>
+        </Flex>
+      )} */}
+
+      {!hasMore && items.length > 0 ? (
+        <Text mt={4} textAlign="center" color="gray.500">
           Semua transaksi telah ditampilkan.
-        </p>
+        </Text>
+      ) : (
+        <Flex justify="center" mt={4}>
+          <Button variant="link" color="red.500" onClick={handleShowMore}>
+            Show more
+          </Button>
+        </Flex>
       )}
-    </div>
+    </Box>
   );
 };
 

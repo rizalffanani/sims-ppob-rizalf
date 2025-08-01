@@ -1,20 +1,44 @@
 import { useState } from "react";
+import {
+  Box,
+  Button,
+  Flex,
+  Input,
+  SimpleGrid,
+  Text,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
 import { useAppDispatch } from "../app/hooks";
 import { saveTopup } from "../features/balance/balanceSlice";
+import CustomModal from "../components/Modal";
 
 const TopUpPage = () => {
   const dispatch = useAppDispatch();
   const [amount, setAmount] = useState(0);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const presetAmounts = [10000, 20000, 50000, 100000, 250000, 500000];
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   const handleTopUp = async () => {
+    if (amount < 10000 || amount > 1000000) {
+      toast({
+        title: "Gagal",
+        description:
+          "Nominal top up minimal Rp10.000 dan maksimal Rp1.000.000.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+      return;
+    }
     if (amount <= 0) return;
 
     setLoading(true);
     try {
       await dispatch(saveTopup({ top_up_amount: amount }));
-      alert("Top up berhasil!");
-      setAmount(0); // reset nominal setelah sukses
+      onOpen();
     } catch {
       alert("Terjadi kesalahan saat top up.");
     } finally {
@@ -22,27 +46,57 @@ const TopUpPage = () => {
     }
   };
 
+  const handlePresetClick = (value: number) => {
+    setAmount(value);
+  };
+
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Top Up</h2>
-      <div className="bg-white p-4 rounded shadow max-w-sm mx-auto">
-        <label className="block mb-2 font-medium">Nominal Top Up</label>
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
-          className="border p-2 rounded w-full mb-4"
-          min={1}
-        />
-        <button
-          onClick={handleTopUp}
-          disabled={loading || amount <= 0}
-          className="bg-blue-600 text-white px-4 py-2 rounded w-full disabled:opacity-50"
-        >
-          {loading ? "Memproses..." : "Top Up"}
-        </button>
-      </div>
-    </div>
+    <Box maxW="6xl" mx="auto" mt={12} px={6}>
+      <CustomModal
+        isOpen={isOpen}
+        onClose={onClose}
+        text={"Top Up"}
+        amount={amount}
+      />
+      <Text mb={2} fontWeight="medium">
+        Silahkan masukan <br />
+        <Text as="span" fontWeight="bold">
+          Nominal Top Up
+        </Text>
+      </Text>
+      <Flex gap={4} flexDir={{ base: "column", md: "row" }}>
+        <Box flex="1">
+          <Input
+            placeholder="masukkan nominal Top Up"
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(Number(e.target.value))}
+            mb={4}
+          />
+          <Button
+            colorScheme="gray"
+            isDisabled={loading || amount <= 0}
+            isLoading={loading}
+            onClick={handleTopUp}
+            width="full"
+          >
+            Top Up
+          </Button>
+        </Box>
+
+        <SimpleGrid columns={{ base: 3, md: 3 }} spacing={2}>
+          {presetAmounts.map((value) => (
+            <Button
+              key={value}
+              variant="outline"
+              onClick={() => handlePresetClick(value)}
+            >
+              Rp{value.toLocaleString("id-ID")}
+            </Button>
+          ))}
+        </SimpleGrid>
+      </Flex>
+    </Box>
   );
 };
 

@@ -1,15 +1,33 @@
 import { useEffect, useState } from "react";
+import {
+  Box,
+  Heading,
+  Text,
+  VStack,
+  Image,
+  Input,
+  Button,
+  HStack,
+  Icon,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   fetchServices,
   clearSelectedService,
 } from "../features/services/serviceSlice";
-import { newTransaction } from "../features/transaction/transactionSlice";
+import {
+  newTransaction,
+  fetchHistory,
+} from "../features/transaction/transactionSlice";
+import { getBalance } from "../features/balance/balanceSlice";
+import CustomModal from "../components/Modal";
 
 const TransactionNewPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const selectedService = useAppSelector(
     (state) => state.services.selectedService
   );
@@ -30,8 +48,13 @@ const TransactionNewPage = () => {
     try {
       await dispatch(
         newTransaction({ service_code: selectedService.service_code })
-      );
-      alert("Transaksi berhasil!");
+      )
+        .unwrap()
+        .then(() => {
+          dispatch(getBalance());
+          dispatch(fetchHistory());
+        });
+      onOpen();
     } catch {
       alert("Gagal melakukan transaksi.");
     } finally {
@@ -42,47 +65,58 @@ const TransactionNewPage = () => {
   if (!selectedService) return null;
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Transaksi Layanan</h2>
-      <div className="max-w-sm mx-auto border p-4 rounded shadow">
-        <h3 className="mb-2">Pembayaran</h3>
+    <Box maxW="6xl" mx="auto" mt={12} px={6}>
+      <CustomModal
+        isOpen={isOpen}
+        onClose={onClose}
+        text={`Pembayaran ${selectedService.service_name}`}
+        amount={selectedService.service_tariff}
+      />
+      <Text mb={2} fontWeight="semibold">
+        PemBayaran
+      </Text>
 
-        <div className="flex items-center gap-3 mb-3">
-          <img
-            src={selectedService.service_icon}
-            alt={selectedService.service_name}
-            className="h-10"
-            onError={(e) =>
-              (e.currentTarget.src =
-                "https://via.placeholder.com/40?text=No+Icon")
-            }
-          />
-          <p className="text-sm">{selectedService.service_name}</p>
-        </div>
-
-        <input
-          type="number"
-          readOnly
-          value={selectedService.service_tariff}
-          className="w-full border p-2 mb-2 bg-gray-100"
+      <HStack spacing={3} mb={4}>
+        <Image
+          src={selectedService.service_icon}
+          alt={selectedService.service_name}
+          boxSize="32px"
+          fallbackSrc="https://via.placeholder.com/40?text=No+Icon"
         />
+        <Text fontWeight="bold">{selectedService.service_name}</Text>
+      </HStack>
 
-        <button
-          onClick={handleTransaction}
-          disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded w-full disabled:opacity-50"
-        >
-          {loading ? "Memproses..." : "Kirim Transaksi"}
-        </button>
+      <HStack mb={4}>
+        <Input
+          type="number"
+          isReadOnly
+          value={selectedService.service_tariff}
+          bg="gray.50"
+          borderColor="gray.300"
+          _focus={{ borderColor: "gray.300", boxShadow: "none" }}
+        />
+      </HStack>
 
-        <button
-          onClick={() => dispatch(clearSelectedService())}
-          className="mt-2 w-full text-sm text-gray-500"
-        >
-          Kembali ke daftar layanan
-        </button>
-      </div>
-    </div>
+      <Button
+        colorScheme="red"
+        size="md"
+        width="100%"
+        mb={2}
+        onClick={handleTransaction}
+        isLoading={loading}
+      >
+        Bayar
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        width="100%"
+        onClick={() => dispatch(clearSelectedService())}
+      >
+        Kembali ke daftar layanan
+      </Button>
+    </Box>
   );
 };
 

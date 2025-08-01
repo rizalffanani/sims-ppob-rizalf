@@ -13,6 +13,8 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { getProfile } from "../features/auth/authSlice";
 import { getBalance, selectBalance } from "../features/balance/balanceSlice";
+import profilImg from "../assets/profil.png";
+
 export default function Header() {
   const dispatch = useAppDispatch();
   const { user, loading } = useAppSelector((state) => state.auth);
@@ -32,7 +34,11 @@ export default function Header() {
         <Box>
           <Avatar
             name={`${user?.first_name} ${user?.last_name}`}
-            src={user?.profile_image}
+            src={
+              user?.profile_image?.includes("null")
+                ? profilImg
+                : user?.profile_image || profilImg
+            }
             size="md"
           />
           <Text fontSize="sm" color="gray.600">
@@ -43,7 +49,9 @@ export default function Header() {
           </Heading>
         </Box>
         <Box
-          bg="red.500"
+          bgImage="url('/background-saldo.png')"
+          bgSize="cover"
+          bgPosition="center"
           color="white"
           p={6}
           borderRadius="xl"

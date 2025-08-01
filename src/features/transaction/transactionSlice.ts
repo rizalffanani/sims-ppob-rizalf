@@ -33,6 +33,7 @@ export const fetchHistory = createAsyncThunk(
   "transaction/fetchHistory",
   async (_, thunkAPI) => {
     try {
+      // thunkAPI.dispatch(incrementOffset());
       const { offset, limit } = (thunkAPI.getState() as RootState).transaction;
       const response = await getHistoryTransactionAPI(
         offset.toString(),
@@ -79,16 +80,17 @@ const transactionSlice = createSlice({
       .addCase(fetchHistory.fulfilled, (state, action) => {
         state.loading = false;
 
-        // Filter duplikat berdasarkan invoice_number
         const newItems = (action.payload as HistoryItem[]).filter(
           (item: HistoryItem) =>
             !state.items.some(
               (existing) => existing.invoice_number === item.invoice_number
             )
         );
-
         state.items.push(...newItems);
-        state.hasMore = newItems.length > 0; // Jika tidak ada data baru, berarti data habis
+        state.hasMore = newItems.length === state.limit;
+        if (newItems.length > 0) {
+          state.offset += state.limit;
+        }
       })
       .addCase(fetchHistory.rejected, (state, action) => {
         state.loading = false;
