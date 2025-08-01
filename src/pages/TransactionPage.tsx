@@ -8,7 +8,7 @@ import {
 
 const TransactionPage = () => {
   const dispatch = useAppDispatch();
-  const { loading, error, items, hasMore } = useAppSelector(
+  const { loading, error, items } = useAppSelector(
     (state) => state.transaction
   );
 
@@ -26,7 +26,8 @@ const TransactionPage = () => {
   }, [dispatch]);
 
   const handleShowMore = () => {
-    if (!loading && hasMore) {
+    if (!loading) {
+      dispatch(incrementOffset());
       dispatch(fetchHistory());
     }
   };
@@ -81,26 +82,6 @@ const TransactionPage = () => {
           Show more
         </Button>
       </Flex>
-
-      {/* {hasMore && !loading && (
-        <Flex justify="center" mt={4}>
-          <Button variant="link" color="red.500" onClick={handleShowMore}>
-            Show more
-          </Button>
-        </Flex>
-      )} */}
-
-      {!hasMore && items.length > 0 ? (
-        <Text mt={4} textAlign="center" color="gray.500">
-          Semua transaksi telah ditampilkan.
-        </Text>
-      ) : (
-        <Flex justify="center" mt={4}>
-          <Button variant="link" color="red.500" onClick={handleShowMore}>
-            Show more
-          </Button>
-        </Flex>
-      )}
     </Box>
   );
 };

@@ -9,7 +9,6 @@ import {
   Input,
   Text,
   VStack,
-  Icon,
   useToast,
 } from "@chakra-ui/react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
@@ -19,7 +18,6 @@ import {
   uploadProfileImage,
   logout,
 } from "../features/auth/authSlice";
-import defaultImg from "../assets/profil.png";
 import profilImg from "../assets/profil.png";
 import { useNavigate } from "react-router-dom";
 

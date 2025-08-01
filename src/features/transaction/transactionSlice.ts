@@ -87,10 +87,6 @@ const transactionSlice = createSlice({
             )
         );
         state.items.push(...newItems);
-        state.hasMore = newItems.length === state.limit;
-        if (newItems.length > 0) {
-          state.offset += state.limit;
-        }
       })
       .addCase(fetchHistory.rejected, (state, action) => {
         state.loading = false;

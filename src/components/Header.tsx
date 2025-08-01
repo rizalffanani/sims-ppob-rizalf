@@ -1,14 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Grid,
-  Box,
-  Flex,
-  Avatar,
-  Text,
-  Heading,
-  Button,
-  Icon,
-} from "@chakra-ui/react";
+import { Grid, Box, Avatar, Text, Heading, Button } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { getProfile } from "../features/auth/authSlice";

@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
 import {
   Box,
-  Heading,
   Text,
-  VStack,
   Image,
   Input,
   Button,
   HStack,
-  Icon,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
